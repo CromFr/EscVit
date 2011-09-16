@@ -1,0 +1,10 @@
+0	1	mikroCdsPIC.exe -MSF -DBG -pP24FJ64GA002 -DL -SSA -O11111114 -fo32 -N"K:\Escvit\v3.0\escvit.mcpds" -SP"C:\Program Files (x86)\mikroC PRO for dsPIC\defs\" -SP"C:\Program Files (x86)\mikroC PRO for dsPIC\uses\" -SP"K:\Escvit\v3.0\" "escvit.c" "__Lib_Math.mcl" "__Lib_MathDouble.mcl" "__Lib_System.mcl" "__Lib_Delays.mcl" "__Lib_CType.mcl" "__Lib_CString.mcl" "__Lib_CStdlib.mcl" "__Lib_CMath.mcl" "__Lib_Setjmp.mcl" "__Lib_Conversions.mcl" "__Lib_Sprintf.mcl" "__Lib_PrintOut.mcl" "__Lib_Sprinti.mcl" "__Lib_Sprintl.mcl" "__Lib_Time.mcl" "__Lib_Trigonometry.mcl" "__Lib_Button.mcl" "__Lib_Keypad4x4.mcl" "__Lib_Manchester.mcl" "__Lib_OneWire.mcl" "__Lib_PS2.mcl" "__Lib_Sound.mcl" "__Lib_SoftI2C.mcl" "__Lib_SoftSPI.mcl" "__Lib_SoftUART.mcl" "__Lib_ADC_1_p24FJ_p30.mcl" "__Lib_FLASH_p24_p33.mcl" "__Lib_I2C_12_p24_p33.mcl" "__Lib_PWM_1.mcl" "__Lib_SPI_12.mcl" "__Lib_UART_12_p24_p33.mcl" "__Lib_PPS_p24FJ64GA004_DPC28.mcl" "__Lib_PortExpander.mcl" "__Lib_CANSPI.mcl" "__Lib_GlcdFonts.mcl" "__Lib_LcdConsts.mcl" "__Lib_Lcd.mcl" "__Lib_Mmc.mcl" "__Lib_MmcFat16.mcl" "__Lib_RS485.mcl" "__Lib_S1D13700.mcl" "__Lib_SPIGlcd.mcl" "__Lib_SPILcd.mcl" "__Lib_SPILcd8.mcl" "__Lib_SPIT6963C.mcl" "__Lib_EthEnc28j60.mcl" "__Lib_EthEnc24j600.mcl" "__Lib_TFT.mcl" "__Lib_TouchPanel_TFT.mcl"	 
+diagnostics: 0	121	Loading...	 
+diagnostics: 0	126	All files Preprocessed in 8190 ms	 
+diagnostics: 0	122	Compilation Started	escvit.c
+warning: 6	1507	Unknown pragma line ignored: ''	escvit.c
+warning: 1003	1503	Result is not defined in function: 'Puissance'	escvit.c
+diagnostics: 1078	123	Compiled Successfully	escvit.c
+diagnostics: 0	127	All files Compiled in 375 ms	 
+error: 0	434	Demo Limit	Demo Limit
+error: 0	102	Finished (with errors): 29 janv. 2011, 17:02:21	escvit.mcpds
