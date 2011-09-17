@@ -6,19 +6,21 @@
 */
 
 //LCD
-sbit LCD_D4 at RB10_bit;
-sbit LCD_D5 at RB11_bit;
-sbit LCD_D6 at RB12_bit;
-sbit LCD_D7 at RB13_bit;
-sbit LCD_RS at RB14_bit;
-sbit LCD_EN at RB15_bit;
+sbit LCD_RS at RD4_bit;
+sbit LCD_EN at RD5_bit;
+sbit LCD_D4 at RD0_bit;
+sbit LCD_D5 at RD1_bit;
+sbit LCD_D6 at RD2_bit;
+sbit LCD_D7 at RD3_bit;
 
-sbit LCD_D4_Direction at TRISB10_bit;
-sbit LCD_D5_Direction at TRISB11_bit;
-sbit LCD_D6_Direction at TRISB12_bit;
-sbit LCD_D7_Direction at TRISB13_bit;
-sbit LCD_RS_Direction at TRISB14_bit;
-sbit LCD_EN_Direction at TRISB15_bit;
+sbit LCD_RS_Direction at TRISD4_bit;
+sbit LCD_EN_Direction at TRISD5_bit;
+sbit LCD_D4_Direction at TRISD0_bit;
+sbit LCD_D5_Direction at TRISD1_bit;
+sbit LCD_D6_Direction at TRISD2_bit;
+sbit LCD_D7_Direction at TRISD3_bit;
+
+
 
 #pragma XINST=1
 
@@ -31,11 +33,14 @@ sbit LCD_EN_Direction at TRISB15_bit;
 #define pMenu PORTB.F5
 
 #define pBumper PORTB.F6
-#define pDepart PORTB.F7
+
+#define pSignalGroupe PORTB.F7
 
 //Sorties
-#define pBuzzer PORTA.F0
-#define pSignalGroupe PORTA.F4
+#define pBuzzer PORTC.F0
+#define pHP PORTB.F5
+#define pLed1 PORTC.F6
+#define pLed2 PORTC.F7
 
 //#pragma config WRDT = OFF
 
@@ -119,12 +124,11 @@ void BipRefus();
 
 void DeplacerCurseur(unsigned short nLigne);
 
-void CustIntToString(int nNbAConvertir, char *Var, int nChars, unsigned short bRemplir);
+void CustIntToString(int nNbAConvertir, char *Var);//, int nChars, unsigned short bRemplir);
 
 int ReadCan(unsigned short nPorte, int nDivision);
 
 int Puissance(int x, int n);
-
 
 
 
@@ -136,20 +140,21 @@ void main()
 char cStabDelay[3]="00";
 
 //Initialisation
-//ADCON1 = 0b11001110;
-ADPCFG = 0xFFFF;
+ADCON1 = 0b11001110;
 
 //Toute la porte B en entrée ( /!\ signal de groupe )
-TRISB = 0x000;
-PORTB = 0x000;
+TRISB = 0x00;
+PORTB = 0x00;
 TRISB = 0xFF;
 
-TRISA = 0x00;    //Porte C = sorties
-PORTA = 0x00;
+TRISC = 0x00;    //Porte C = sorties
+PORTC = 0x00;
 
 Lcd_Init();
 Lcd_Cmd(_LCD_CLEAR);
 Lcd_Cmd(_LCD_CURSOR_OFF);
+
+ADC_Init();
 
 //Sound_Init(&PORTA, 3);
 //Sound_Play(440, 100);
@@ -172,7 +177,7 @@ while(1)
      //=========================================================================================================================================================
      //Action sur le bouton de Haut ============================================================================================================================
      if(pHaut)
-          {
+          {/*
           //Menus spéciaux
           if(nMenu == MAINMENU_PARAMETRES_HTEURMUR)
                {
@@ -291,7 +296,7 @@ while(1)
                Lcd_Out(nCurPos,3,"~");
                }
 
-          while(pHaut){}
+          while(pHaut){}*/
           }
      //=========================================================================================================================================================
      //Action sur le bouton de Bas =============================================================================================================================
@@ -781,8 +786,8 @@ nCurLimBas = 0;
 
 //nHauteurMurM = EEPROM_Read(0x0);
 //nHauteurMurCM = EEPROM_Read(0x1);
-//CustIntToString(nHauteurMurM, cHauteurMurM);
-//CustIntToString(nHauteurMurCM, cHauteurMurCM);
+CustIntToString(nHauteurMurM, cHauteurMurM);
+CustIntToString(nHauteurMurCM, cHauteurMurCM);
 Lcd_Out(2, 3, cHauteurMurM);
 Lcd_Out(2, 5, ".");
 Lcd_Out(2, 6, cHauteurMurCM);
@@ -969,11 +974,11 @@ void BipRefus()
 {
 //Bip sonore
 pBuzzer = 1;
-Delay_ms(60);
-pBuzzer = 0;
 Delay_ms(40);
+pBuzzer = 0;
+Delay_ms(20);
 pBuzzer = 1;
-Delay_ms(60);
+Delay_ms(40);
 pBuzzer = 0;
 }
 
@@ -1010,14 +1015,16 @@ return nReturn;*/
 // Var : Variable dans laquelle sera placée la conversion
 // nChars : 0 => chiffres alignés à gauche, Sinon les chiffres seront alignés à gauche et nChars = nombre max de chiffres à afficher
 // bRemplir : FALSE => les caractères inutilisés seront ignorés, TRUE => seront remplis de "0" (inutile si nChars==0)
-void CustIntToString(int nNbAConvertir, char *Var, int nChars, unsigned short bRemplir)
-{/*
+void CustIntToString(int nNbAConvertir, char *Var)//, int nChars, unsigned short bRemplir)
+{
 unsigned int nVarSoustraction = 0;
 unsigned int nChiffreAConvertir = 0;
 int nChiffres = 1;
 int nPow = 10;
 int n;
 int nNegatif = 0;
+
+int nChars=5;
 
 if(nNbAConvertir<0)
      {
@@ -1033,7 +1040,7 @@ while(nNbAConvertir >= nPow)
      }
 
 //Remplissage
-if(bRemplir)
+/*if(bRemplir)
      {
      for(n=1 ; nChars-nChiffres-(n-1)>=0 ; n++)
           {
@@ -1046,7 +1053,7 @@ else
           {
           //Var[nChars-nChiffres-(n-1)] = 0x20;
           }
-     }
+     }  */
 
 //Conversion
 for(n=1 ; n<=nChiffres ; n++ )
@@ -1074,7 +1081,7 @@ for(n=1 ; n<=nChiffres ; n++ )
           }
 
      nVarSoustraction += nChiffreAConvertir*( Puissance(10, (nChiffres-n)) );
-     }*/
+     }
 }
 
 
@@ -1082,9 +1089,9 @@ for(n=1 ; n<=nChiffres ; n++ )
 
 
 
-/*
+
 int ReadCan(unsigned short nPorte, int nDivision)
-{
+{/*
 //nPorte = 0 ==> Potar menus
 //nPorte = 1 ==> Plaque Dep
 int nValLue;
@@ -1108,5 +1115,5 @@ if(nDivision!=0)
 else
      {
      return nValLue;
-     }
-}*/
+     }*/
+}

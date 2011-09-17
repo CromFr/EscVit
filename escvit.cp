@@ -1,20 +1,20 @@
-#line 1 "K:/Escvit/v3.0/escvit.c"
-#line 9 "K:/Escvit/v3.0/escvit.c"
-sbit LCD_D4 at RB10_bit;
-sbit LCD_D5 at RB11_bit;
-sbit LCD_D6 at RB12_bit;
-sbit LCD_D7 at RB13_bit;
-sbit LCD_RS at RB14_bit;
-sbit LCD_EN at RB15_bit;
+#line 1 "C:/Users/Administrateur/Git Projects/EscVit/escvit.c"
+#line 9 "C:/Users/Administrateur/Git Projects/EscVit/escvit.c"
+sbit LCD_RS at RD4_bit;
+sbit LCD_EN at RD5_bit;
+sbit LCD_D4 at RD0_bit;
+sbit LCD_D5 at RD1_bit;
+sbit LCD_D6 at RD2_bit;
+sbit LCD_D7 at RD3_bit;
 
-sbit LCD_D4_Direction at TRISB10_bit;
-sbit LCD_D5_Direction at TRISB11_bit;
-sbit LCD_D6_Direction at TRISB12_bit;
-sbit LCD_D7_Direction at TRISB13_bit;
-sbit LCD_RS_Direction at TRISB14_bit;
-sbit LCD_EN_Direction at TRISB15_bit;
+sbit LCD_RS_Direction at TRISD4_bit;
+sbit LCD_EN_Direction at TRISD5_bit;
+sbit LCD_D4_Direction at TRISD0_bit;
+sbit LCD_D5_Direction at TRISD1_bit;
+sbit LCD_D6_Direction at TRISD2_bit;
+sbit LCD_D7_Direction at TRISD3_bit;
 #pragma XINST=1
-#line 43 "K:/Escvit/v3.0/escvit.c"
+#line 48 "C:/Users/Administrateur/Git Projects/EscVit/escvit.c"
 unsigned short nMenu;
 short nCurPos;
 unsigned short nCurLimHaut;
@@ -94,12 +94,11 @@ void BipRefus();
 
 void DeplacerCurseur(unsigned short nLigne);
 
-void CustIntToString(int nNbAConvertir, char *Var, int nChars, unsigned short bRemplir);
+void CustIntToString(int nNbAConvertir, char *Var);
 
 int ReadCan(unsigned short nPorte, int nDivision);
 
 int Puissance(int x, int n);
-
 
 
 
@@ -111,24 +110,25 @@ void main()
 char cStabDelay[3]="00";
 
 
+ADCON1 = 0b11001110;
 
-ADPCFG = 0xFFFF;
 
-
-TRISB = 0x000;
-PORTB = 0x000;
+TRISB = 0x00;
+PORTB = 0x00;
 TRISB = 0xFF;
 
-TRISA = 0x00;
-PORTA = 0x00;
+TRISC = 0x00;
+PORTC = 0x00;
 
 Lcd_Init();
 Lcd_Cmd(_LCD_CLEAR);
 Lcd_Cmd(_LCD_CURSOR_OFF);
-#line 164 "K:/Escvit/v3.0/escvit.c"
- PORTA.F0  = 1;
+
+ADC_Init();
+#line 169 "C:/Users/Administrateur/Git Projects/EscVit/escvit.c"
+ PORTC.F0  = 1;
 Delay_ms(150);
- PORTA.F0  = 0;
+ PORTC.F0  = 0;
 
 _MainMenu_SelectModes();
 
@@ -137,126 +137,8 @@ while(1)
 
 
  if( PORTB.F0 )
+#line 299 "C:/Users/Administrateur/Git Projects/EscVit/escvit.c"
  {
-
- if(nMenu == MAINMENU_PARAMETRES_HTEURMUR)
- {
-
- if(nHauteurMurM>=30)
- {
- BipRefus();
- }
- else
- {
- Bip();
-
- nHauteurMurCM++;
- if(nHauteurMurCM == 100)
- {
- nHauteurMurCM = 0;
- nHauteurMurM++;
- }
-
- }
- }
-
- else if(nMenu == MAINMENU_PARAMETRES_STAB)
- {
- Bip();
-
- if(nStab == STAB_AUTO)
- {
- nStab = STAB_SANS;
- Lcd_Out(2, 4, STR_STAB_SANS);
- Lcd_Out(3, 6, "     ");
- }
- else if(nStab == STAB_MANU)
- {
- nStab = STAB_AUTO;
- Lcd_Out(2, 4, STR_STAB_AUTO);
-
- Lcd_Out(3, 6, cStabDelay);
- Lcd_Out(3, 8, STR_UNITE_SEC);
- }
- else if(nStab == STAB_SANS)
- {
- nStab = STAB_MANU;
- Lcd_Out(2, 4, STR_STAB_MANU);
- }
- }
- else if(nMenu == MAINMENU_PARAMETRES_AFFVIT)
- {
- if(nUniteVitesse == UNITE_VITESSE_MS)
- {
- Bip();
- nUniteVitesse = UNITE_VITESSE_KMH;
- Lcd_Out(2, 14, STR_UNITE_KMH);
- }
- else if(nUniteVitesse == UNITE_VITESSE_KMH)
- {
- Bip();
- nUniteVitesse = UNITE_VITESSE_MS;
- Lcd_Out(2, 14, STR_UNITE_MS);
- }
- }
- else if(nMenu == MAINMENU_PARAMETRES_DUREEDECOMPTE)
- {
- if(nDureeDecompte != 10)
- {
- Bip();
- nDureeDecompte++;
-
- Lcd_Out(2, 8, cDureeDecompte);
- }
- else
- {
- BipRefus();
- }
- }
- else if(nMenu == MAINMENU_PARAMETRES_BIPSDECOMPTE)
- {
- if(nBipsDecompte != 5 && nDureeDecompte<=nBipsDecompte)
- {
- Bip();
- nBipsDecompte++;
-
- Lcd_Out(2, 8, cBipsDecompte);
- }
- else
- {
- BipRefus();
- }
- }
-
-
- else if(nCurPos-1 < nCurLimHaut)
- {
- if(nMenu == MAINMENU_PARAMETRES_BIS)
- {
- Bip();
-
-
- _MainMenu_Parametres();
-
- DeplacerCurseur(4);
- }
- else
- {
- BipRefus();
- }
- }
- else
- {
- Bip();
-
-
- Lcd_Out(nCurPos,3," ");
-
- nCurPos--;
- Lcd_Out(nCurPos,3,"~");
- }
-
- while( PORTB.F0 ){}
  }
 
 
@@ -746,8 +628,8 @@ nCurLimBas = 0;
 
 
 
-
-
+CustIntToString(nHauteurMurM, cHauteurMurM);
+CustIntToString(nHauteurMurCM, cHauteurMurCM);
 Lcd_Out(2, 3, cHauteurMurM);
 Lcd_Out(2, 5, ".");
 Lcd_Out(2, 6, cHauteurMurCM);
@@ -924,22 +806,22 @@ nCurLimBas = 0;
 void Bip()
 {
 
- PORTA.F0  = 1;
+ PORTC.F0  = 1;
 Delay_ms(70);
- PORTA.F0  = 0;
+ PORTC.F0  = 0;
 }
 
 
 void BipRefus()
 {
 
- PORTA.F0  = 1;
-Delay_ms(60);
- PORTA.F0  = 0;
+ PORTC.F0  = 1;
 Delay_ms(40);
- PORTA.F0  = 1;
-Delay_ms(60);
- PORTA.F0  = 0;
+ PORTC.F0  = 0;
+Delay_ms(20);
+ PORTC.F0  = 1;
+Delay_ms(40);
+ PORTC.F0  = 0;
 }
 
 
@@ -954,7 +836,7 @@ Lcd_Out(nCurPos,3,"~");
 
 
 int Puissance(int x, int n)
-#line 1002 "K:/Escvit/v3.0/escvit.c"
+#line 1007 "C:/Users/Administrateur/Git Projects/EscVit/escvit.c"
 {
 }
 
@@ -966,7 +848,65 @@ int Puissance(int x, int n)
 
 
 
-void CustIntToString(int nNbAConvertir, char *Var, int nChars, unsigned short bRemplir)
-#line 1077 "K:/Escvit/v3.0/escvit.c"
+void CustIntToString(int nNbAConvertir, char *Var)
+{
+unsigned int nVarSoustraction = 0;
+unsigned int nChiffreAConvertir = 0;
+int nChiffres = 1;
+int nPow = 10;
+int n;
+int nNegatif = 0;
+
+int nChars=5;
+
+if(nNbAConvertir<0)
+ {
+ nNegatif = 1;
+
+ }
+
+
+while(nNbAConvertir >= nPow)
+ {
+
+
+ }
+#line 1059 "C:/Users/Administrateur/Git Projects/EscVit/escvit.c"
+for(n=1 ; n<=nChiffres ; n++ )
+ {
+ if(nNegatif && n==1)
+ {
+ if(nChars!=0)
+ {
+
+ }
+ else
+ {
+
+ }
+ }
+ nChiffreAConvertir = (nNbAConvertir-nVarSoustraction)/( Puissance(10, (nChiffres-n)) );
+
+ if(nChars!=0)
+ {
+
+ }
+ else
+ {
+
+ }
+
+ nVarSoustraction += nChiffreAConvertir*( Puissance(10, (nChiffres-n)) );
+ }
+}
+
+
+
+
+
+
+
+int ReadCan(unsigned short nPorte, int nDivision)
+#line 1118 "C:/Users/Administrateur/Git Projects/EscVit/escvit.c"
 {
 }
